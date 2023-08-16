@@ -1,3 +1,5 @@
+USE employee_manager; 
+
 INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES ("Seth", "Rogan", 3, 2);
 INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES ("Paul", "Rudd", 4, 1);
 INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES ("James", "Franco", 2, 1);

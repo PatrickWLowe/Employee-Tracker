@@ -155,14 +155,25 @@ const addEmployee = () => {
       },
       {
         type: "input",
-        name: "role_id",
-        message: "What is the role ID of the employee you would like to add?",
+        name: "title",
+        message: "What is the job title of the employee you would like to add?",
       },
       {
         type: "input",
         name: "manager_id",
         message:
           "What is the manager ID of the employee you would like to add?",
+      },
+      {
+        type: "input",
+        name: "department",
+        message:
+          "What is the department of the employee you would like to add?",
+      },
+      {
+        type: "input",
+        name: "salary",
+        message: "What is the salary of the employee you would like to add?",
       },
     ])
     .then(function (response) {
@@ -171,8 +182,10 @@ const addEmployee = () => {
         {
           first_name: response.first_name,
           last_name: response.last_name,
-          role_id: response.role_id,
+          title: response.title,
           manager_id: response.manager_id,
+          department: response.department,
+          salary: response.salary,
         },
         function (err, res) {
           if (err) throw err;
@@ -181,6 +194,70 @@ const addEmployee = () => {
         }
       );
     });
+};
+
+const updateEmployee = () => {
+  db.query("SELECT * FROM employee", function (err, res) {
+    if (err) throw err;
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          name: "SelectedEmployee",
+          message: "Which Employee do you want to update?",
+          choices: function () {
+            let employeelist = [];
+            res.forEach((res) => {
+              employeelist.push(res.last_name);
+            });
+            return employeelist;
+          },
+        },
+      ])
+      .then(function (answer) {
+        console.log(answer);
+        const employeename = answer.SelectedEmployee;
+        db.query("SELECT * FROM role", function (err, res) {
+          inquirer
+            .prompt([
+              {
+                type: "list",
+                name: "SelectedRole",
+                message: "What is the new role of the employee?",
+                choices: function () {
+                  let rolelist = [];
+                  res.forEach((res) => {
+                    rolelist.push(res.title);
+                  });
+                  return rolelist;
+                },
+              },
+            ])
+            .then(function (roleAnswer) {
+              const rolechange = roleAnswer.SelectedRole;
+              console.log(rolechange);
+              db.query(
+                "SELECT * FROM role WHERE title = ?",
+                [rolechange],
+                function (err, res) {
+                  if (err) throw err;
+                  let role_title = res[0].title;
+                  let query =
+                    "UPDATE employee SET title = ? WHERE last_name = ?";
+                  let values = [role_title, employeename];
+                  console.log(values);
+                  db.query(query, values, function (err, res, fields) {
+                    console.log(
+                      `Updated ${employeename}'s role to ${rolechange}.`
+                    );
+                    Start();
+                  });
+                }
+              );
+            });
+        });
+      });
+  });
 };
 
 const Initialize = () => {
